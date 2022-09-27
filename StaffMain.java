@@ -1,55 +1,72 @@
 package com.gl.caseStudy1;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class StaffMain {
-	public static Double totalCalculation(Applicant applicant) {
-		if(applicant.subject1Mark<50 || applicant.subject2Mark<50 || applicant.subject3Mark<50)
-			return 0.0;
-		else {
-		applicant.total=applicant.subject1Mark+applicant.subject2Mark+applicant.subject3Mark;
-		return applicant.total;
-		}
-	}
-	public static Double percentageCalculation(Double total) {
-		double percentage=Double.parseDouble(String.format("%.2f",(total/300)*100));
-		return percentage;
-	}
-
+	 public static Double totalCalculation (Applicant applicant) {
+		 Double m1=applicant.getSubject1Mark();
+		 Double m2=applicant.getSubjec2Mark();
+		 Double m3=applicant.getSubject3Mark();
+		 if (m1<50 || m2<50 || m3<50) {
+			 return 0.0;
+		 }
+		 else {
+			 Double total=m1+m2+m3;
+			 return total;
+		 }
+	 }
+	 
+	 public static Double percentageCalculation (Double total) {
+		 Double per= (total/300)*100;
+		 DecimalFormat df = new DecimalFormat("0.00");
+		 String persentage=df.format(per);
+		 return Double.parseDouble(persentage) ;
+	 }
 	public static void main(String[] args) {
+		Integer id=100;
 		Scanner sc=new Scanner(System.in);
-		System.out.println("Enter number of applicants:");
-		int n=Integer.parseInt(sc.nextLine());
-		Applicant aplarr[]=new Applicant[n];
-		for(int i=0;i<n;i++) {
-			System.out.println("Enter applicant details:");
+		Integer n;
+		while (true) {
+			System.out.println("Enter the number applicants:");
+			n = Integer.parseInt(sc.nextLine());
+			if (n>0)
+				break;
+		}
+		List<Applicant> applicantList=new ArrayList<Applicant>();
+		for (int i=0;i<n;i++)
+		{
+			System.out.println("Enter the applicant details");
 			String str=sc.nextLine();
+			String[] arr = str.split(",");
+			String name=arr[0];
+			Double ms1=Double.parseDouble(arr[1]);
+			Double ms2=Double.parseDouble(arr[2]);
+			Double ms3=Double.parseDouble(arr[3]);
 			try {
-				String arr[]=str.split(",");
-				double sub1mark=Double.parseDouble(arr[1]);
-				double sub2mark=Double.parseDouble(arr[2]);
-				double sub3mark=Double.parseDouble(arr[3]);
-				if(sub1mark<0 || sub1mark>100)
-					throw new MarksException("Invalid Marks");
-				if(sub2mark<0 || sub1mark>100)
-					throw new MarksException("Invalid Marks");
-				if(sub3mark<0 || sub1mark>100)
-					throw new MarksException("Invalid Marks");
-				Applicant ap=new Applicant(arr[0],sub1mark,sub2mark,sub3mark);
-				double total=totalCalculation(ap);
-				if(total==0.0) {
-					continue;
-				}
-				else {
-				double percentage=percentageCalculation(total);
-				Applicant applicant=new Applicant(arr[0],sub1mark,sub2mark,sub3mark,total,percentage);
-				aplarr[i]=applicant;
+				if(ms1>100 || ms1<0 || ms2>100 || ms2<0 || ms3>100 || ms3<0 ) {
+					throw new MarksException("\nInvalid marks; should be between 0 and 100\n");
 				}
 			}
-			catch(MarksException me) {
-        		System.out.println(me.getMessage());
-        	}
-		}
-		for(Applicant a:aplarr)
-			System.out.println(a);
+			catch (MarksException e) {
+				System.out.println(e.getMessage());
+				continue;
+			}
+			Applicant a=new Applicant(name,ms1,ms2,ms3,0.0,0.0);
+			a.setId(++id);
+			Double total=totalCalculation(a);
+			Double percentage=percentageCalculation(total);
+			a.setTotal(total);
+			if (total==0.0 || percentage<70.00)
+				continue;
+			a.setPercentage(percentage);
+			applicantList.add(a);
 	}
+		System.out.println("Output format");
+		applicantList.forEach((applicant)->System.out.println(applicant));
+		
+
+}
 }
